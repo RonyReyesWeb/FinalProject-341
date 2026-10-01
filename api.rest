@@ -1,0 +1,84 @@
+### Use with the VS Code "REST Client" extension
+@host = http://localhost:3000
+# @host = https://<your-app>.onrender.com
+
+### Get all authors
+GET {{host}}/authors
+
+### Create an author
+POST {{host}}/authors
+Content-Type: application/json
+
+{
+  "firstName": "Brandon",
+  "lastName": "Sanderson",
+  "birthDate": "1975-12-19",
+  "nationality": "American",
+  "email": "brandon@example.com"
+}
+
+### Get one author (paste an id)
+GET {{host}}/authors/PASTE_AUTHOR_ID
+
+### Update an author
+PUT {{host}}/authors/PASTE_AUTHOR_ID
+Content-Type: application/json
+
+{
+  "firstName": "Brandon",
+  "lastName": "Sanderson",
+  "birthDate": "1975-12-19",
+  "nationality": "American",
+  "email": "contact@brandonsanderson.com"
+}
+
+### Delete an author
+DELETE {{host}}/authors/PASTE_AUTHOR_ID
+
+### Validation error demo (expect 400)
+POST {{host}}/authors
+Content-Type: application/json
+
+{ "firstName": "", "birthDate": "not-a-date" }
+
+### Get all books
+GET {{host}}/books
+
+### Create a book
+POST {{host}}/books
+Content-Type: application/json
+
+{
+  "title": "Mistborn: The Final Empire",
+  "authorId": "PASTE_AUTHOR_ID",
+  "isbn": "9780765311788",
+  "genre": "Fantasy",
+  "publishedYear": 2006,
+  "pages": 541,
+  "publisher": "Tor Books",
+  "available": true
+}
+
+### Get one book
+GET {{host}}/books/PASTE_BOOK_ID
+
+### Update a book
+PUT {{host}}/books/PASTE_BOOK_ID
+Content-Type: application/json
+
+{
+  "title": "Mistborn: The Final Empire",
+  "authorId": "PASTE_AUTHOR_ID",
+  "isbn": "9780765311788",
+  "genre": "Epic Fantasy",
+  "publishedYear": 2006,
+  "pages": 541,
+  "publisher": "Tor Books",
+  "available": false
+}
+
+### Delete a book
+DELETE {{host}}/books/PASTE_BOOK_ID
+
+### Invalid id demo (expect 400)
+GET {{host}}/books/123

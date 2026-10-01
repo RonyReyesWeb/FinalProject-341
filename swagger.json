@@ -1,0 +1,613 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "CSE 341 Library API",
+    "description": "Final project API for managing authors and books.",
+    "version": "1.0.0"
+  },
+  "basePath": "/",
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "tags": [
+    {
+      "name": "Authors"
+    },
+    {
+      "name": "Books"
+    }
+  ],
+  "paths": {
+    "/authors": {
+      "get": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Get all authors",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Author"
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Create a new author",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AuthorInput"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Author"
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/authors/{id}": {
+      "get": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Get a author by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the author"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Author"
+            }
+          },
+          "400": {
+            "description": "Invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Author not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Update a author by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the author"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AuthorInput"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Updated (no content)"
+          },
+          "400": {
+            "description": "Validation failed / invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Author not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Delete a author by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the author"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "400": {
+            "description": "Invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Author not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "409": {
+            "description": "Author still has books",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/books": {
+      "get": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Get all books",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Book"
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Create a new book",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BookInput"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Book"
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "409": {
+            "description": "ISBN already exists",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/books/{id}": {
+      "get": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Get a book by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the book"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Book"
+            }
+          },
+          "400": {
+            "description": "Invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Book not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Update a book by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the book"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/BookInput"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Updated (no content)"
+          },
+          "400": {
+            "description": "Validation failed / invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Book not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "409": {
+            "description": "ISBN already exists",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Delete a book by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the book"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "400": {
+            "description": "Invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Book not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "AuthorInput": {
+      "type": "object",
+      "required": [
+        "firstName",
+        "lastName",
+        "birthDate",
+        "nationality"
+      ],
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "example": "Brandon"
+        },
+        "lastName": {
+          "type": "string",
+          "example": "Sanderson"
+        },
+        "birthDate": {
+          "type": "string",
+          "format": "date",
+          "example": "1975-12-19"
+        },
+        "nationality": {
+          "type": "string",
+          "example": "American"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "example": "brandon@example.com"
+        }
+      }
+    },
+    "Author": {
+      "type": "object",
+      "required": [
+        "firstName",
+        "lastName",
+        "birthDate",
+        "nationality"
+      ],
+      "properties": {
+        "_id": {
+          "type": "string",
+          "example": "66fb1c2e8f1b2a3c4d5e6f70"
+        },
+        "firstName": {
+          "type": "string",
+          "example": "Brandon"
+        },
+        "lastName": {
+          "type": "string",
+          "example": "Sanderson"
+        },
+        "birthDate": {
+          "type": "string",
+          "format": "date",
+          "example": "1975-12-19"
+        },
+        "nationality": {
+          "type": "string",
+          "example": "American"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "example": "brandon@example.com"
+        }
+      }
+    },
+    "BookInput": {
+      "type": "object",
+      "required": [
+        "title",
+        "authorId",
+        "isbn",
+        "genre",
+        "publishedYear",
+        "pages",
+        "publisher"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Mistborn: The Final Empire"
+        },
+        "authorId": {
+          "type": "string",
+          "example": "66fb1c2e8f1b2a3c4d5e6f70",
+          "description": "ObjectId of an existing author"
+        },
+        "isbn": {
+          "type": "string",
+          "example": "9780765311788",
+          "description": "10 or 13 digits, no dashes"
+        },
+        "genre": {
+          "type": "string",
+          "example": "Fantasy"
+        },
+        "publishedYear": {
+          "type": "integer",
+          "example": 2006
+        },
+        "pages": {
+          "type": "integer",
+          "example": 541
+        },
+        "publisher": {
+          "type": "string",
+          "example": "Tor Books"
+        },
+        "available": {
+          "type": "boolean",
+          "example": true
+        }
+      }
+    },
+    "Book": {
+      "type": "object",
+      "required": [
+        "title",
+        "authorId",
+        "isbn",
+        "genre",
+        "publishedYear",
+        "pages",
+        "publisher"
+      ],
+      "properties": {
+        "_id": {
+          "type": "string",
+          "example": "66fb1c2e8f1b2a3c4d5e6f70"
+        },
+        "title": {
+          "type": "string",
+          "example": "Mistborn: The Final Empire"
+        },
+        "authorId": {
+          "type": "string",
+          "example": "66fb1c2e8f1b2a3c4d5e6f70",
+          "description": "ObjectId of an existing author"
+        },
+        "isbn": {
+          "type": "string",
+          "example": "9780765311788",
+          "description": "10 or 13 digits, no dashes"
+        },
+        "genre": {
+          "type": "string",
+          "example": "Fantasy"
+        },
+        "publishedYear": {
+          "type": "integer",
+          "example": 2006
+        },
+        "pages": {
+          "type": "integer",
+          "example": 541
+        },
+        "publisher": {
+          "type": "string",
+          "example": "Tor Books"
+        },
+        "available": {
+          "type": "boolean",
+          "example": true
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "field": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
