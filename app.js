@@ -10,6 +10,7 @@ const { notFound, errorHandler } = require('./middleware/errorHandler');
 const app = express();
 
 // Render sits behind a proxy; needed so secure cookies work over HTTPS
+
 app.set('trust proxy', 1);
 
 app.use(cors());
