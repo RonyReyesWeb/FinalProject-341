@@ -1,12 +1,13 @@
 {
   "name": "cse341-final-project",
   "version": "1.0.0",
-  "description": "CSE 341 Final Project - Library API (books & authors)",
+  "description": "CSE 341 Final Project - Library API (authors, books, members, loans)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "swagger": "node swagger.js"
+    "swagger": "node swagger.js",
+    "test": "jest"
   },
   "engines": {
     "node": ">=18"
@@ -17,11 +18,19 @@
     "express": "^4.21.2",
     "express-validator": "^7.2.0",
     "mongodb": "^6.10.0",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "express-session": "^1.18.1",
+    "passport": "^0.7.0",
+    "passport-github2": "^0.1.12"
   },
   "devDependencies": {
     "nodemon": "^3.1.7",
-    "swagger-autogen": "^2.23.7"
+    "swagger-autogen": "^2.23.7",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "jest": {
+    "testEnvironment": "node"
+  }
 }

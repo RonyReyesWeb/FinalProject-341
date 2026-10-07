@@ -78,7 +78,12 @@ const update = async (req, res, next) => {
 
 const remove = async (req, res, next) => {
   try {
-    const result = await collection().deleteOne({ _id: new ObjectId(req.params.id) });
+    const id = new ObjectId(req.params.id);
+    const openLoans = await getDb().collection('loans').countDocuments({ bookId: id, returned: false });
+    if (openLoans > 0) {
+      return res.status(409).json({ error: 'Cannot delete book: it is currently on loan' });
+    }
+    const result = await collection().deleteOne({ _id: id });
     if (result.deletedCount === 0) return res.status(404).json({ error: 'Book not found' });
     res.status(200).json({ message: 'Book deleted successfully' });
   } catch (err) {

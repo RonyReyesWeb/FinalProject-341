@@ -82,3 +82,52 @@ DELETE {{host}}/books/PASTE_BOOK_ID
 
 ### Invalid id demo (expect 400)
 GET {{host}}/books/123
+
+############ MEMBERS (POST/PUT/DELETE need login: open /login in the browser first) ############
+
+### Get all members
+GET {{host}}/members
+
+### Create a member
+POST {{host}}/members
+Content-Type: application/json
+
+{
+  "firstName": "Ana",
+  "lastName": "Lopez",
+  "email": "ana.lopez@example.com",
+  "phone": "+1 604-555-0123",
+  "membershipType": "student",
+  "joinDate": "2026-09-01"
+}
+
+### Get one member
+GET {{host}}/members/PASTE_MEMBER_ID
+
+############ LOANS ############
+
+### Get all loans
+GET {{host}}/loans
+
+### Create a loan
+POST {{host}}/loans
+Content-Type: application/json
+
+{
+  "bookId": "PASTE_BOOK_ID",
+  "memberId": "PASTE_MEMBER_ID",
+  "loanDate": "2026-10-01",
+  "dueDate": "2026-10-15",
+  "returned": false
+}
+
+### Validation demo: dueDate before loanDate (expect 400)
+POST {{host}}/loans
+Content-Type: application/json
+
+{
+  "bookId": "PASTE_BOOK_ID",
+  "memberId": "PASTE_MEMBER_ID",
+  "loanDate": "2026-10-15",
+  "dueDate": "2026-10-01"
+}

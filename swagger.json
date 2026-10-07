@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "CSE 341 Library API",
-    "description": "Final project API for managing authors and books.",
+    "description": "Library API for managing authors, books, members and loans.\n\n**Authentication:** GET requests are public. POST, PUT and DELETE require you to log in with GitHub: open [/login](/login) in this browser first, then come back here. Check your status at [/auth/status](/auth/status). Log out at [/logout](/logout).",
     "version": "1.0.0"
   },
   "basePath": "/",
@@ -18,6 +18,15 @@
     },
     {
       "name": "Books"
+    },
+    {
+      "name": "Members"
+    },
+    {
+      "name": "Loans"
+    },
+    {
+      "name": "Auth"
     }
   ],
   "paths": {
@@ -60,6 +69,7 @@
             }
           }
         ],
+        "description": "Requires login (visit /login first).",
         "responses": {
           "201": {
             "description": "Created",
@@ -69,6 +79,12 @@
           },
           "400": {
             "description": "Validation failed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Not logged in",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -146,12 +162,19 @@
             }
           }
         ],
+        "description": "Requires login (visit /login first).",
         "responses": {
           "204": {
             "description": "Updated (no content)"
           },
           "400": {
             "description": "Validation failed / invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Not logged in",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -184,12 +207,19 @@
             "description": "MongoDB ObjectId of the author"
           }
         ],
+        "description": "Requires login (visit /login first).",
         "responses": {
           "200": {
             "description": "Deleted"
           },
           "400": {
             "description": "Invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Not logged in",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -254,6 +284,7 @@
             }
           }
         ],
+        "description": "Requires login (visit /login first).",
         "responses": {
           "201": {
             "description": "Created",
@@ -263,6 +294,12 @@
           },
           "400": {
             "description": "Validation failed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Not logged in",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -346,12 +383,19 @@
             }
           }
         ],
+        "description": "Requires login (visit /login first).",
         "responses": {
           "204": {
             "description": "Updated (no content)"
           },
           "400": {
             "description": "Validation failed / invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Not logged in",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -390,6 +434,7 @@
             "description": "MongoDB ObjectId of the book"
           }
         ],
+        "description": "Requires login (visit /login first).",
         "responses": {
           "200": {
             "description": "Deleted"
@@ -400,8 +445,20 @@
               "$ref": "#/definitions/Error"
             }
           },
+          "401": {
+            "description": "Not logged in",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
           "404": {
             "description": "Book not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "409": {
+            "description": "Book is on loan",
             "schema": {
               "$ref": "#/definitions/Error"
             }
@@ -411,6 +468,455 @@
             "schema": {
               "$ref": "#/definitions/Error"
             }
+          }
+        }
+      }
+    },
+    "/members": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Get all members",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Member"
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Create a new member",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MemberInput"
+            }
+          }
+        ],
+        "description": "Requires login (visit /login first).",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Member"
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "409": {
+            "description": "Email already exists",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/members/{id}": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Get a member by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the member"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Member"
+            }
+          },
+          "400": {
+            "description": "Invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Member not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Update a member by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the member"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MemberInput"
+            }
+          }
+        ],
+        "description": "Requires login (visit /login first).",
+        "responses": {
+          "204": {
+            "description": "Updated (no content)"
+          },
+          "400": {
+            "description": "Validation failed / invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Member not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "409": {
+            "description": "Email already exists",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Delete a member by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the member"
+          }
+        ],
+        "description": "Requires login (visit /login first).",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "400": {
+            "description": "Invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Member not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "409": {
+            "description": "Member has unreturned loans",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/loans": {
+      "get": {
+        "tags": [
+          "Loans"
+        ],
+        "summary": "Get all loans",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Loan"
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Loans"
+        ],
+        "summary": "Create a new loan",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoanInput"
+            }
+          }
+        ],
+        "description": "Requires login (visit /login first).",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Loan"
+            }
+          },
+          "400": {
+            "description": "Validation failed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/loans/{id}": {
+      "get": {
+        "tags": [
+          "Loans"
+        ],
+        "summary": "Get a loan by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the loan"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Loan"
+            }
+          },
+          "400": {
+            "description": "Invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Loan not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Loans"
+        ],
+        "summary": "Update a loan by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the loan"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoanInput"
+            }
+          }
+        ],
+        "description": "Requires login (visit /login first).",
+        "responses": {
+          "204": {
+            "description": "Updated (no content)"
+          },
+          "400": {
+            "description": "Validation failed / invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Loan not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Loans"
+        ],
+        "summary": "Delete a loan by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the loan"
+          }
+        ],
+        "description": "Requires login (visit /login first).",
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "400": {
+            "description": "Invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Loan not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/auth/status": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Check whether you are logged in",
+        "responses": {
+          "200": {
+            "description": "Login status"
           }
         }
       }
@@ -584,6 +1090,182 @@
         "available": {
           "type": "boolean",
           "example": true
+        }
+      }
+    },
+    "MemberInput": {
+      "type": "object",
+      "required": [
+        "firstName",
+        "lastName",
+        "email",
+        "phone",
+        "membershipType",
+        "joinDate"
+      ],
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "example": "Ana"
+        },
+        "lastName": {
+          "type": "string",
+          "example": "Lopez"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "example": "ana.lopez@example.com"
+        },
+        "phone": {
+          "type": "string",
+          "example": "+1 604-555-0123"
+        },
+        "membershipType": {
+          "type": "string",
+          "enum": [
+            "standard",
+            "premium",
+            "student"
+          ],
+          "example": "student"
+        },
+        "joinDate": {
+          "type": "string",
+          "format": "date",
+          "example": "2026-09-01"
+        }
+      }
+    },
+    "Member": {
+      "type": "object",
+      "required": [
+        "firstName",
+        "lastName",
+        "email",
+        "phone",
+        "membershipType",
+        "joinDate"
+      ],
+      "properties": {
+        "_id": {
+          "type": "string",
+          "example": "66fb1c2e8f1b2a3c4d5e6f70"
+        },
+        "firstName": {
+          "type": "string",
+          "example": "Ana"
+        },
+        "lastName": {
+          "type": "string",
+          "example": "Lopez"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "example": "ana.lopez@example.com"
+        },
+        "phone": {
+          "type": "string",
+          "example": "+1 604-555-0123"
+        },
+        "membershipType": {
+          "type": "string",
+          "enum": [
+            "standard",
+            "premium",
+            "student"
+          ],
+          "example": "student"
+        },
+        "joinDate": {
+          "type": "string",
+          "format": "date",
+          "example": "2026-09-01"
+        }
+      }
+    },
+    "LoanInput": {
+      "type": "object",
+      "required": [
+        "bookId",
+        "memberId",
+        "loanDate",
+        "dueDate"
+      ],
+      "properties": {
+        "bookId": {
+          "type": "string",
+          "example": "66fb1c2e8f1b2a3c4d5e6f70",
+          "description": "ObjectId of an existing book"
+        },
+        "memberId": {
+          "type": "string",
+          "example": "66fb1c2e8f1b2a3c4d5e6f71",
+          "description": "ObjectId of an existing member"
+        },
+        "loanDate": {
+          "type": "string",
+          "format": "date",
+          "example": "2026-10-01"
+        },
+        "dueDate": {
+          "type": "string",
+          "format": "date",
+          "example": "2026-10-15",
+          "description": "Must be after loanDate"
+        },
+        "returned": {
+          "type": "boolean",
+          "example": false
+        },
+        "notes": {
+          "type": "string",
+          "example": "Handle with care"
+        }
+      }
+    },
+    "Loan": {
+      "type": "object",
+      "required": [
+        "bookId",
+        "memberId",
+        "loanDate",
+        "dueDate"
+      ],
+      "properties": {
+        "_id": {
+          "type": "string",
+          "example": "66fb1c2e8f1b2a3c4d5e6f70"
+        },
+        "bookId": {
+          "type": "string",
+          "example": "66fb1c2e8f1b2a3c4d5e6f70",
+          "description": "ObjectId of an existing book"
+        },
+        "memberId": {
+          "type": "string",
+          "example": "66fb1c2e8f1b2a3c4d5e6f71",
+          "description": "ObjectId of an existing member"
+        },
+        "loanDate": {
+          "type": "string",
+          "format": "date",
+          "example": "2026-10-01"
+        },
+        "dueDate": {
+          "type": "string",
+          "format": "date",
+          "example": "2026-10-15",
+          "description": "Must be after loanDate"
+        },
+        "returned": {
+          "type": "boolean",
+          "example": false
+        },
+        "notes": {
+          "type": "string",
+          "example": "Handle with care"
         }
       }
     },

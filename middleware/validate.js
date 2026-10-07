@@ -41,4 +41,39 @@ const bookRules = [
   body('available').optional().isBoolean().withMessage('available must be true or false').toBoolean()
 ];
 
-module.exports = { handleValidation, idRule, authorRules, bookRules };
+const memberRules = [
+  body('firstName').trim().notEmpty().withMessage('firstName is required').isLength({ max: 50 }),
+  body('lastName').trim().notEmpty().withMessage('lastName is required').isLength({ max: 50 }),
+  body('email').trim().notEmpty().withMessage('email is required').isEmail().withMessage('email must be a valid email'),
+  body('phone')
+    .trim()
+    .notEmpty().withMessage('phone is required')
+    .matches(/^[0-9+()\-\s]{7,20}$/).withMessage('phone must be 7-20 digits (may include + ( ) - and spaces)'),
+  body('membershipType')
+    .isIn(['standard', 'premium', 'student'])
+    .withMessage('membershipType must be one of: standard, premium, student'),
+  body('joinDate')
+    .notEmpty().withMessage('joinDate is required')
+    .isISO8601().withMessage('joinDate must be a date in YYYY-MM-DD format')
+];
+
+const loanRules = [
+  body('bookId').isMongoId().withMessage('bookId must be a valid MongoDB ObjectId of an existing book'),
+  body('memberId').isMongoId().withMessage('memberId must be a valid MongoDB ObjectId of an existing member'),
+  body('loanDate')
+    .notEmpty().withMessage('loanDate is required')
+    .isISO8601().withMessage('loanDate must be a date in YYYY-MM-DD format'),
+  body('dueDate')
+    .notEmpty().withMessage('dueDate is required')
+    .isISO8601().withMessage('dueDate must be a date in YYYY-MM-DD format')
+    .custom((dueDate, { req }) => {
+      if (req.body.loanDate && new Date(dueDate) <= new Date(req.body.loanDate)) {
+        throw new Error('dueDate must be after loanDate');
+      }
+      return true;
+    }),
+  body('returned').optional().isBoolean().withMessage('returned must be true or false').toBoolean(),
+  body('notes').optional().isString().isLength({ max: 500 }).withMessage('notes must be 500 characters or fewer')
+];
+
+module.exports = { handleValidation, idRule, authorRules, bookRules, memberRules, loanRules };

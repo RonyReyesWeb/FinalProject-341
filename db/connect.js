@@ -1,4 +1,9 @@
 const { MongoClient } = require('mongodb');
+const dns = require('dns');
+
+// Fix for "querySrv ECONNREFUSED" on some Windows networks: the router's DNS
+// can't resolve the SRV record that mongodb+srv:// needs, so use public DNS.
+dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 let database;
 
