@@ -14,6 +14,7 @@ router.get('/', (req, res) => {
         ? `<p>Logged in as <strong>${escapeHtml(user.displayName)}</strong>. <a href="/logout">Log out</a></p>`
         : '<p>You are logged out. <a href="/login">Log in with GitHub</a></p>'
     }
+    ${user ? '<p><a href="/users/me">My user profile</a></p>' : ''}
     <p><a href="/api-docs">API documentation (Swagger)</a></p>
   `);
 });
@@ -22,5 +23,6 @@ router.use('/authors', require('./authors'));
 router.use('/books', require('./books'));
 router.use('/members', require('./members'));
 router.use('/loans', require('./loans'));
+router.use('/users', require('./users'));
 
 module.exports = router;

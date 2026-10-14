@@ -9,13 +9,16 @@ CSE 341 Final Project — **Library API** (Node.js, Express, MongoDB, GitHub OAu
 | `books` | title, authorId (→ authors), isbn, genre, publishedYear, pages, publisher, available |
 | `members` | firstName, lastName, email, phone, membershipType (standard/premium/student), joinDate |
 | `loans` | bookId (→ books), memberId (→ members), loanDate, dueDate, returned, notes |
+| `users` | githubId, username, displayName, email, avatarUrl, profileUrl, role, loginCount, createdAt, lastLogin — created/updated automatically on GitHub login |
 
-Each collection has full CRUD: `GET /`, `GET /:id`, `POST /`, `PUT /:id`, `DELETE /:id`.
+Authors, books, members and loans have full CRUD: `GET /`, `GET /:id`, `POST /`, `PUT /:id`, `DELETE /:id`.
 
 ## Authentication (GitHub OAuth)
 - `GET` requests are public.
 - `POST`, `PUT`, `DELETE` on **all four collections** require login → otherwise `401`.
 - `/login` → GitHub login, `/logout`, `/auth/status` → shows if you're logged in.
+- **User management:** the first GitHub login creates a document in `users`; later logins update the profile, `lastLogin` and `loginCount`.
+- `GET /users`, `GET /users/me`, `GET /users/:id`, `DELETE /users/:id` — all require login.
 
 ## Validation & error handling
 - `400` — invalid ObjectId, failed validation on POST/PUT (all four collections), malformed JSON, or a reference (authorId / bookId / memberId) that doesn't exist
@@ -25,8 +28,8 @@ Each collection has full CRUD: `GET /`, `GET /:id`, `POST /`, `PUT /:id`, `DELET
 - `500` — unexpected server/database errors (every controller uses try/catch → central error handler)
 
 ## Tests
-`npm test` runs Jest + Supertest tests for the GET endpoints of all four collections
-(5 tests each: list, get by id, 404, invalid id 400, database error 500). The database is mocked, so tests don't touch Atlas.
+`npm test` runs Jest + Supertest tests for every GET route: authors, books, members, loans and users
+(list, get by id, 404, invalid id 400, database error 500), `/users/me`, `/auth/status`, the home page, and 401 checks for protected routes. The database is mocked, so tests don't touch Atlas.
 
 ## Run locally
 ```bash
@@ -45,3 +48,4 @@ Open http://localhost:3000/api-docs
 |---|---|---|---|
 | 5 | Rony | | |
 | 6 | Rony | | |
+| 7 | Rony | | |

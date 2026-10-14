@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "CSE 341 Library API",
-    "description": "Library API for managing authors, books, members and loans.\n\n**Authentication:** GET requests are public. POST, PUT and DELETE require you to log in with GitHub: open [/login](/login) in this browser first, then come back here. Check your status at [/auth/status](/auth/status). Log out at [/logout](/logout).",
+    "description": "Library API for managing authors, books, members and loans, with GitHub OAuth user management.\n\n**Authentication:** GET requests on authors, books, members and loans are public. POST, PUT and DELETE, and every /users route, require you to log in with GitHub: open [/login](/login) in this browser first, then come back here. Check your status at [/auth/status](/auth/status). Log out at [/logout](/logout).\n\n**Users** are created automatically the first time someone logs in, and their profile and login count are updated on every login.",
     "version": "1.0.0"
   },
   "basePath": "/",
@@ -26,7 +26,12 @@
       "name": "Loans"
     },
     {
-      "name": "Auth"
+      "name": "Users",
+      "description": "Users created through GitHub login (login required)"
+    },
+    {
+      "name": "Auth",
+      "description": "GitHub OAuth login, logout and status"
     }
   ],
   "paths": {
@@ -908,6 +913,202 @@
         }
       }
     },
+    "/users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get all users",
+        "description": "Requires login (visit /login first).",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/users/me": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get the profile of the logged-in user",
+        "description": "Requires login (visit /login first).",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "User profile not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get a user by id",
+        "description": "Requires login (visit /login first).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Delete a user by id",
+        "description": "Requires login (visit /login first).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "MongoDB ObjectId of the user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "400": {
+            "description": "Invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Log in with GitHub",
+        "description": "Open [/login](/login) directly in the browser (not with Try it out): it redirects to GitHub, then back to the site with a session cookie.",
+        "responses": {
+          "302": {
+            "description": "Redirect to GitHub"
+          },
+          "500": {
+            "description": "OAuth not configured",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/logout": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Log out",
+        "description": "Open [/logout](/logout) in the browser. Ends the session and redirects to the home page.",
+        "responses": {
+          "302": {
+            "description": "Redirect to home page"
+          }
+        }
+      }
+    },
     "/auth/status": {
       "get": {
         "tags": [
@@ -916,7 +1117,33 @@
         "summary": "Check whether you are logged in",
         "responses": {
           "200": {
-            "description": "Login status"
+            "description": "Login status",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "loggedIn": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "user": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "string"
+                    },
+                    "githubId": {
+                      "type": "string"
+                    },
+                    "username": {
+                      "type": "string"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1288,6 +1515,55 @@
               }
             }
           }
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "example": "66fb1c2e8f1b2a3c4d5e6f72"
+        },
+        "githubId": {
+          "type": "string",
+          "example": "123456"
+        },
+        "username": {
+          "type": "string",
+          "example": "octocat"
+        },
+        "displayName": {
+          "type": "string",
+          "example": "The Octocat"
+        },
+        "email": {
+          "type": "string",
+          "example": "octocat@example.com"
+        },
+        "avatarUrl": {
+          "type": "string",
+          "example": "https://avatars.githubusercontent.com/u/123456"
+        },
+        "profileUrl": {
+          "type": "string",
+          "example": "https://github.com/octocat"
+        },
+        "role": {
+          "type": "string",
+          "example": "member"
+        },
+        "loginCount": {
+          "type": "integer",
+          "example": 3
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lastLogin": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     }

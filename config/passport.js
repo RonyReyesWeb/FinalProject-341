@@ -1,5 +1,6 @@
 const passport = require('passport');
 const GitHubStrategy = require('passport-github2').Strategy;
+const { upsertFromGithub } = require('../controllers/users');
 
 const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } = process.env;
 // Accept either name for the callback variable
@@ -10,13 +11,20 @@ if (GITHUB_CLIENT_ID && GITHUB_CLIENT_SECRET && CALLBACK_URL) {
   passport.use(
     new GitHubStrategy(
       { clientID: GITHUB_CLIENT_ID, clientSecret: GITHUB_CLIENT_SECRET, callbackURL: CALLBACK_URL },
-      (accessToken, refreshToken, profile, done) => {
-        // Store only what we need in the session
-        done(null, {
-          id: profile.id,
-          username: profile.username,
-          displayName: profile.displayName || profile.username
-        });
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          // Save/update the user in the "users" collection
+          const user = await upsertFromGithub(profile);
+          // Store only what we need in the session
+          done(null, {
+            _id: String(user._id),
+            githubId: user.githubId,
+            username: user.username,
+            displayName: user.displayName
+          });
+        } catch (err) {
+          done(err);
+        }
       }
     )
   );
